@@ -16,30 +16,18 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        node-version: ["18", "20"]
-        postgres-version: ["14", "15", "16"]
+        test-command: ["jest", "vitest", "vitest --poolOptions.vmThreads.singleThread=true", "vitest --poolOptions.forks.singleFork=true"]
       fail-fast: false
-    services:
-      postgres:
-        image: postgres:${{ matrix.postgres-version }}
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
           cache: "pnpm"
+      - run: npx envinfo --system --npmPackages '{vitest,@vitest/*,vite,@vitejs/*}' --binaries --browsers
       - run: pnpm install
-      - run: pnpm install libpg-query@${{ matrix.postgres-version }}
-      - run: pnpm test
+      - run: pnpm test:${{ matrix.test-command }}
