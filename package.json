@@ -6,7 +6,8 @@
   "packageManager": "pnpm@8.15.8",
   "scripts": {
     "test:vitest": "vitest vitest",
-    "test:jest": "jest jest"
+    "test:jest": "jest jest",
+    "test:js": "node index.js"
   },
   "keywords": [],
   "author": "",
