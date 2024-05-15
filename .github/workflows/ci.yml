@@ -19,7 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test-command: ["jest", "vitest", "vitest --poolOptions.vmThreads.singleThread=true", "vitest --poolOptions.forks.singleFork=true"]
+        test-command: [
+            "pnpm jest jest",
+            "pnpm vitest vitest",
+            "pnpm vitest vitest --pool=threads",
+            "pnpm vitest vitest --pool=forks",
+            "pnpm vitest vitest --pool=vmThreads",
+            "pnpm test:js"
+        ]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -30,4 +37,4 @@ jobs:
           cache: "pnpm"
       - run: npx envinfo --system --npmPackages '{vitest,@vitest/*,vite,@vitejs/*}' --binaries --browsers
       - run: pnpm install
-      - run: pnpm test:${{ matrix.test-command }}
+      - run: ${{ matrix.test-command }}
